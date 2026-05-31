@@ -1,6 +1,17 @@
 <div class="container" style="direction: rtl; font-family: sans-serif; padding: 20px;">
   <h2>ספר המתכונים הדינמי שלנו 🍲</h2>
   
+  @if (loading) {
+    <p style="color: blue;">טוען מתכונים מהשרת (אנא המתן)...</p>
+  }
+  
+  @if (errorMessage) {
+    <div style="background: #ffebee; color: red; padding: 15px; border-radius: 8px; border: 1px solid red; margin-bottom: 20px;">
+      <h3>שגיאה בטעינת מתכונים:</h3>
+      <code>{{ errorMessage }}</code>
+    </div>
+  }
+  
   <div class="recipes-grid" style="display: flex; gap: 20px; flex-wrap: wrap;">
     @for (recipe of recipes; track recipe.title) {
       <div class="recipe-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; width: 300px; background: #fafafa;">
@@ -29,7 +40,9 @@
         </div>
       </div>
     } @empty {
-      <p>טוען מתכונים או שלא נמצאו מתכונים בבסיס הנתונים...</p>
+      @if (!loading && !errorMessage) {
+        <p>לא נמצאו מתכונים בבסיס הנתונים...</p>
+      }
     }
   </div>
 </div>

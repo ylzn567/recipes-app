@@ -1,1 +1,29 @@
-<router-outlet></router-outlet>
+<div class="app-layout">
+  <!-- סרגל צד / ניווט -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>ספר מתכונים 🍲</h2>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a routerLink="/" class="nav-link">🏠 דף הבית</a>
+      
+      <!-- אם המשתמש לא מחובר -->
+      @if (!authService.isLoggedIn()) {
+        <a routerLink="/login" class="nav-link btn-login">🔑 התחברות</a>
+        <a routerLink="/register" class="nav-link btn-register">📝 הרשמה</a>
+      } @else {
+        <!-- אם המשתמש מחובר -->
+        <div class="user-info">
+          <p>שלום, <strong>{{ authService.getUsername() }}</strong> 👋</p>
+        </div>
+        <a href="javascript:void(0)" (click)="onLogout()" class="nav-link btn-logout">🚪 התנתקות</a>
+      }
+    </nav>
+  </aside>
+
+  <!-- תוכן העמוד הראשי (ראוטר) -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

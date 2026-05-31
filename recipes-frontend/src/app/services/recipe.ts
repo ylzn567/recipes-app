@@ -17,3 +17,5 @@ export class RecipeService {
     return this.http.get<Recipe[]>(this.apiUrl);
   }
 }
+
+export type { Recipe };

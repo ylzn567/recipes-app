@@ -1,0 +1,110 @@
+/* עיצוב כללי של האפליקציה עם סרגל צד */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  direction: rtl;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7fafc;
+}
+
+/* סרגל צד */
+.sidebar {
+  width: 250px;
+  background: white;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  z-index: 10;
+}
+
+.sidebar-header {
+  border-bottom: 2px solid #edf2f7;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.sidebar-header h2 {
+  color: #2d3748;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* ניווט בסרגל הצד */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: block;
+}
+
+.nav-link:hover {
+  background-color: #edf2f7;
+  color: #2b6cb0;
+}
+
+/* כפתורים מיוחדים בניווט */
+.btn-login {
+  background-color: #ebf4ff;
+  color: #3182ce;
+  border: 1px solid #bee3f8;
+}
+
+.btn-login:hover {
+  background-color: #3182ce;
+  color: white;
+}
+
+.btn-register {
+  background-color: #f0fff4;
+  color: #38a169;
+  border: 1px solid #c6f6d5;
+}
+
+.btn-register:hover {
+  background-color: #38a169;
+  color: white;
+}
+
+.btn-logout {
+  background-color: #fff5f5;
+  color: #e53e3e;
+  border: 1px solid #fed7d7;
+  margin-top: auto;
+}
+
+.btn-logout:hover {
+  background-color: #e53e3e;
+  color: white;
+}
+
+/* אזור משתמש */
+.user-info {
+  background-color: #edf2f7;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.user-info p {
+  margin: 0;
+}
+
+/* אזור תוכן ראשי */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
