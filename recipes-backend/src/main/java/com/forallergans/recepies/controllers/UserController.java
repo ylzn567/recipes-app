@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import com.forallergans.recepies.dtos.UserDTO;
 import com.forallergans.recepies.dtos.UserRegisterDTO;
 import com.forallergans.recepies.entities.User;
-
 import com.forallergans.recepies.services.UserService;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,10 +25,11 @@ public class UserController {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, JwtUtils jwtUtils) {
+    // מתקנים את הקונסטרקטור ומזריקים את ה-passwordEncoder בצורה מסודרת
+    public UserController(UserService userService, JwtUtils jwtUtils, BCryptPasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtUtils = jwtUtils;
-        this.passwordEncoder = new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
     }
 
     // א. הרשמת משתמש חדש
@@ -60,10 +61,9 @@ public class UserController {
         String password = loginRequest.get("password");
 
         // שולפים את המשתמש מה-DB לפי שם המשתמש
-        User user = userService.getUserByUsername(username)
-                .orElse(null);
+        User user = userService.getUserByUsername(username).orElse(null);
 
-        // בודקים האם המשתמש קיים והאם הסיסמה המוצפנת ב-DB מתאימה לסיסמה שהוקלדה
+        // בודקים האם המשתמש קיים והאם הסיסמה המוצפנת ב-DB מתאימה
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("שם משתמש או סיסמה שגויים");
         }

@@ -1,0 +1,90 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>🍳 הרשמה</h1>
+      <p>צרי חשבון חדש ותתחילי לשתף מתכונים!</p>
+    </div>
+
+    <form (ngSubmit)="onRegister()" class="auth-form">
+      <!-- שדה שם משתמש -->
+      <div class="form-group">
+        <label for="username">שם משתמש</label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="בחרי שם משתמש"
+          autocomplete="username"
+        />
+      </div>
+
+      <!-- שדה אימייל -->
+      <div class="form-group">
+        <label for="email">אימייל</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="example@email.com"
+          autocomplete="email"
+        />
+      </div>
+
+      <!-- שדה סיסמה -->
+      <div class="form-group">
+        <label for="password">סיסמה</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="לפחות 4 תווים"
+          autocomplete="new-password"
+        />
+      </div>
+
+      <!-- שדה אימות סיסמה -->
+      <div class="form-group">
+        <label for="confirmPassword">אימות סיסמה</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          placeholder="הכניסי שוב את הסיסמה"
+          autocomplete="new-password"
+        />
+      </div>
+
+      <!-- הודעת שגיאה -->
+      @if (errorMessage) {
+        <div class="error-message">
+          ⚠️ {{ errorMessage }}
+        </div>
+      }
+
+      <!-- הודעת הצלחה -->
+      @if (successMessage) {
+        <div class="success-message">
+          ✅ {{ successMessage }}
+        </div>
+      }
+
+      <!-- כפתור הרשמה -->
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="spinner"></span> נרשם...
+        } @else {
+          הרשמה
+        }
+      </button>
+    </form>
+
+    <!-- לינק להתחברות -->
+    <div class="auth-footer">
+      <p>כבר יש לך חשבון? <a routerLink="/login">התחברי כאן</a></p>
+    </div>
+  </div>
+</div>

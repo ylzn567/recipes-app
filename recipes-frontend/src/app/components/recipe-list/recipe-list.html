@@ -1,0 +1,35 @@
+<div class="container" style="direction: rtl; font-family: sans-serif; padding: 20px;">
+  <h2>ספר המתכונים הדינמי שלנו 🍲</h2>
+  
+  <div class="recipes-grid" style="display: flex; gap: 20px; flex-wrap: wrap;">
+    @for (recipe of recipes; track recipe.title) {
+      <div class="recipe-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; width: 300px; background: #fafafa;">
+        <h3>{{ recipe.title }}</h3>
+        <p><strong>זמן הכנה:</strong> {{ recipe.preparationTimeMinutes }} דקות</p>
+        <p><strong>כשרות:</strong> {{ recipe.kashrut }} | <strong>קושי:</strong> {{ recipe.difficulty }}</p>
+        <p><strong>הוראות:</strong> {{ recipe.instructions }}</p>
+        
+        <hr>
+        <h4>רכיבים:</h4>
+        <ul>
+          @for (ing of recipe.ingredients; track ing.product.name) {
+            <li>{{ ing.quantity }} {{ ing.measurementUnit }} - {{ ing.product.name }}</li>
+          }
+        </ul>
+
+        <div class="allergens" style="margin-top: 10px;">
+          <strong>אלרגנים במתכון:</strong>
+          @for (allergen of recipe.allergens; track allergen) {
+            <span style="background: #ffcccc; color: #cc0000; padding: 2px 6px; margin: 2px; border-radius: 4px; font-size: 12px; display: inline-block;">
+              {{ allergen }}
+            </span>
+          } @empty {
+            <span style="background: #d4edda; color: #155724; padding: 2px 6px; border-radius: 4px; font-size: 12px;">ללא אלרגנים</span>
+          }
+        </div>
+      </div>
+    } @empty {
+      <p>טוען מתכונים או שלא נמצאו מתכונים בבסיס הנתונים...</p>
+    }
+  </div>
+</div>
