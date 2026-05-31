@@ -26,6 +26,10 @@ export class RecipeService {
   getRecipesWithoutAllergen(allergen: string): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(`${this.apiUrl}/filter/without-allergen?allergenName=${allergen}`);
   }
+
+  createRecipe(recipe: any): Observable<Recipe> {
+    return this.http.post<Recipe>(this.apiUrl, recipe);
+  }
 }
 
 export type { Recipe };

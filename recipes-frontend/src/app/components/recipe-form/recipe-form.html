@@ -1,0 +1,80 @@
+<div class="form-container" style="direction: rtl; font-family: sans-serif; padding: 20px;">
+  <div class="form-card">
+    <h2 style="color: #2d3748; margin-top: 0; text-align: center;">➕ הוספת מתכון חדש</h2>
+    
+    @if (errorMessage) {
+      <div class="error-msg">{{ errorMessage }}</div>
+    }
+
+    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-group">
+        <label>שם המתכון:</label>
+        <input type="text" formControlName="title" placeholder="למשל: עוגת שוקולד" class="form-control">
+        @if (recipeForm.get('title')?.invalid && recipeForm.get('title')?.touched) {
+          <small class="error-text">שדה חובה</small>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group half">
+          <label>רמת קושי:</label>
+          <select formControlName="difficulty" class="form-control">
+            <option value="EASY">קל</option>
+            <option value="MEDIUM">בינוני</option>
+            <option value="HARD">קשה</option>
+          </select>
+        </div>
+        <div class="form-group half">
+          <label>כשרות:</label>
+          <select formControlName="kashrut" class="form-control">
+            <option value="DAIRY">חלבי</option>
+            <option value="MEAT">בשרי</option>
+            <option value="PARVE">פרווה</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>זמן הכנה (בדקות):</label>
+        <input type="number" formControlName="preparationTimeMinutes" min="1" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>הוראות הכנה:</label>
+        <textarea formControlName="instructions" rows="5" placeholder="הסבירי שלב אחר שלב..." class="form-control"></textarea>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0;">
+      <h3 style="color: #2d3748;">🛒 מצרכים:</h3>
+      
+      <div formArrayName="ingredients">
+        @for (ingredient of ingredients.controls; track $index) {
+          <div [formGroupName]="$index" class="ingredient-row">
+            <input type="text" formControlName="productName" placeholder="שם המצרך (למשל: קמח)" class="form-control ing-name">
+            <input type="number" formControlName="quantity" placeholder="כמות" min="0.1" step="0.1" class="form-control ing-qty">
+            <select formControlName="measurementUnit" class="form-control ing-unit">
+              <option value="UNIT">יחידה</option>
+              <option value="GRAM">גרם</option>
+              <option value="KG">ק"ג</option>
+              <option value="ML">מ"ל</option>
+              <option value="LITER">ליטר</option>
+              <option value="CUP">כוס</option>
+              <option value="TABLESPOON">כף</option>
+              <option value="TEASPOON">כפית</option>
+              <option value="PINCH">קורט</option>
+            </select>
+            <button type="button" class="btn-remove" (click)="removeIngredient($index)" [disabled]="ingredients.length === 1" title="הסר מצרך">❌</button>
+          </div>
+        }
+      </div>
+
+      <button type="button" class="btn-add-ing" (click)="addIngredient()">➕ הוסף עוד מצרך</button>
+
+      <button type="submit" class="btn-submit" [disabled]="isSubmitting || recipeForm.invalid">
+        {{ isSubmitting ? 'שומר מתכון...' : '💾 שמור מתכון במערכת' }}
+      </button>
+
+    </form>
+  </div>
+</div>

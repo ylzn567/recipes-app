@@ -1,19 +1,32 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from './services/auth';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // Retrieve the JWT token from localStorage (standard for Angular-based JWT auth)
   const token = localStorage.getItem('token');
+  const router = inject(Router);
+  const authService = inject(AuthService);
 
-  // If a token is found, clone the request and add the Authorization header
+  let authReq = req;
   if (token) {
-    const authReq = req.clone({
+    authReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
-    return next(authReq);
   }
 
-  // Otherwise, proceed with the original request
-  return next(req);
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      // אם השרת דוחה את הטוקן (למשל כי הוא פג תוקף או השרת הופעל מחדש)
+      if (error.status === 401 || error.status === 403) {
+        authService.logout();
+        router.navigate(['/login']);
+      }
+      return throwError(() => error);
+    })
+  );
 };

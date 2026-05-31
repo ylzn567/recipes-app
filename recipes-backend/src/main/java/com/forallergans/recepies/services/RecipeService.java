@@ -1,3 +1,4 @@
+
 package com.forallergans.recepies.services;
 
 import java.util.List;
@@ -12,6 +13,9 @@ import com.forallergans.recepies.entities.Role;
 import com.forallergans.recepies.entities.User;
 import com.forallergans.recepies.repositories.RecipeRepository;
 import com.forallergans.recepies.repositories.UserRepository;
+import com.forallergans.recepies.repositories.ProductRepository;
+import com.forallergans.recepies.entities.Product;
+import com.forallergans.recepies.entities.RecipeIngredient;
 
 
 @Service
@@ -19,11 +23,13 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public RecipeService(RecipeRepository recipeRepository , UserRepository userRepository) {
+    public RecipeService(RecipeRepository recipeRepository , UserRepository userRepository, ProductRepository productRepository) {
         this.recipeRepository = recipeRepository;
         this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
     // ==========================================
@@ -62,6 +68,23 @@ public class RecipeService {
        
        // משייכים את המשתמש שמצאנו למתכון החדש
        recipe.setCreatedBy(currentUser);
+       
+       // עבור כל מצרך: בדיקה אם המוצר קיים או הוספה שלו, והגדרת קשר דו-כיווני
+       if (recipe.getIngredients() != null) {
+           for (RecipeIngredient ingredient : recipe.getIngredients()) {
+               ingredient.setRecipe(recipe); // קשר חזרה למתכון
+               
+               if (ingredient.getProduct() != null && ingredient.getProduct().getName() != null) {
+                   String productName = ingredient.getProduct().getName();
+                   Product product = productRepository.findByName(productName).orElseGet(() -> {
+                       Product newProduct = new Product();
+                       newProduct.setName(productName);
+                       return productRepository.save(newProduct);
+                   });
+                   ingredient.setProduct(product);
+               }
+           }
+       }
        
        // שומרים את המתכון בבסיס הנתונים
        return recipeRepository.save(recipe);
