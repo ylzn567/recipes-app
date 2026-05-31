@@ -1,36 +1,116 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RecipeService } from '../../services/recipe';
 import { Recipe } from '../../models/recipe.model';
 
 @Component({
   selector: 'app-recipe-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './recipe-list.html',
   styleUrl: './recipe-list.css'
 })
 export class RecipeListComponent implements OnInit {
-  recipes: Recipe[] = [];
+  allRecipes: Recipe[] = []; // השמירה של כל המתכונים המקוריים מהשרת
+  filteredRecipes: Recipe[] = []; // המתכונים שמוצגים בפועל לאחר סינון
+  
   errorMessage: string | null = null;
   loading: boolean = true;
+
+  // משתני סינון מרובים
+  filterKashrut: string = '';
+  filterDifficulty: string = '';
+  
+  // רשימת כל האלרגנים הקיימים במערכת (נחלץ אותם מתוך המתכונים)
+  availableAllergens: string[] = [];
+  // אלרגנים שהמשתמש סימן ב-Checkbox (אלרגנים שהוא *לא* רוצה)
+  excludedAllergens: Set<string> = new Set<string>();
 
   constructor(private recipeService: RecipeService) {}
 
   ngOnInit(): void {
+    this.loadAllRecipes();
+  }
+
+  loadAllRecipes(): void {
     this.loading = true;
+    this.errorMessage = null;
+    
+    // מושכים את כל המתכונים פעם אחת
     this.recipeService.getRecipes().subscribe({
-      next: (data: Recipe[]) => {
-        this.recipes = data;
+      next: (data) => {
+        this.allRecipes = data || [];
+        this.filteredRecipes = [...this.allRecipes];
+        this.extractAllergens();
         this.loading = false;
         this.errorMessage = null;
       },
-      error: (err: any) => {
+      error: (err) => {
         this.loading = false;
-        // מציג את השגיאה המדויקת על המסך
         this.errorMessage = err.message || JSON.stringify(err);
         console.error('שגיאה בשליפת המתכונים:', err);
       }
     });
+  }
+
+  // חילוץ כל האלרגנים מכל המתכונים כדי להציג אותם כצ'קבוקסים
+  private extractAllergens(): void {
+    const allergenSet = new Set<string>();
+    for (const recipe of this.allRecipes) {
+      if (recipe.allergens && recipe.allergens.length > 0) {
+        for (const alg of recipe.allergens) {
+          allergenSet.add(alg);
+        }
+      }
+    }
+    this.availableAllergens = Array.from(allergenSet).sort();
+  }
+
+  // טיפול בשינוי מצב של Checkbox אלרגן
+  toggleAllergen(allergen: string, event: any): void {
+    if (event.target.checked) {
+      this.excludedAllergens.add(allergen);
+    } else {
+      this.excludedAllergens.delete(allergen);
+    }
+    this.applyCombinedFilters();
+  }
+
+  // הפעלת כל הסינונים (קשרות + קושי + אלרגנים) על רשימת המתכונים המקומית
+  applyCombinedFilters(): void {
+    this.filteredRecipes = this.allRecipes.filter(recipe => {
+      // 1. סינון כשרות
+      if (this.filterKashrut && recipe.kashrut !== this.filterKashrut) {
+        return false;
+      }
+      
+      // 2. סינון קושי
+      if (this.filterDifficulty && recipe.difficulty !== this.filterDifficulty) {
+        return false;
+      }
+      
+      // 3. סינון אלרגנים (אם למתכון יש אלרגן שנמצא ברשימת "לא רוצה")
+      if (this.excludedAllergens.size > 0 && recipe.allergens) {
+        const hasExcludedAllergen = recipe.allergens.some(alg => this.excludedAllergens.has(alg));
+        if (hasExcludedAllergen) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }
+
+  clearFilters(): void {
+    this.filterKashrut = '';
+    this.filterDifficulty = '';
+    this.excludedAllergens.clear();
+    
+    // איפוס ה-checkboxes ב-DOM
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((cb: any) => cb.checked = false);
+
+    this.applyCombinedFilters();
   }
 }

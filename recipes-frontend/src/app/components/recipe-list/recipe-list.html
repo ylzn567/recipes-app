@@ -1,47 +1,117 @@
 <div class="container" style="direction: rtl; font-family: sans-serif; padding: 20px;">
   <h2>ספר המתכונים הדינמי שלנו 🍲</h2>
   
+  <!-- אזור הסינון המשולב -->
+  <div class="filters-panel" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+    <h3 style="margin-top: 0; color: #4a5568; font-size: 1.1rem;">סינון מתכונים מתקדם (אפשר לשלב)</h3>
+    
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;">
+      
+      <!-- סינון כשרות -->
+      <div class="filter-group" style="display: flex; flex-direction: column; gap: 5px;">
+        <label for="kashrutFilter">כשרות:</label>
+        <select id="kashrutFilter" [(ngModel)]="filterKashrut" (change)="applyCombinedFilters()" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 150px;">
+          <option value="">הכל</option>
+          <option value="DAIRY">חלבי</option>
+          <option value="MEAT">בשרי</option>
+          <option value="PARVE">פרווה</option>
+        </select>
+      </div>
+
+      <!-- סינון קושי -->
+      <div class="filter-group" style="display: flex; flex-direction: column; gap: 5px;">
+        <label for="difficultyFilter">רמת קושי:</label>
+        <select id="difficultyFilter" [(ngModel)]="filterDifficulty" (change)="applyCombinedFilters()" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 150px;">
+          <option value="">הכל</option>
+          <option value="EASY">קל</option>
+          <option value="MEDIUM">בינוני</option>
+          <option value="HARD">קשה</option>
+        </select>
+      </div>
+      
+      <!-- כפתור ניקוי -->
+      <div style="display: flex; align-items: flex-end;">
+        <button (click)="clearFilters()" style="padding: 8px 15px; background: #e2e8f0; border: none; border-radius: 5px; cursor: pointer; height: 35px;">
+          🔄 נקה הכל
+        </button>
+      </div>
+    </div>
+
+    <!-- סינון אלרגנים ב-Checkboxes -->
+    <div class="filter-group" style="display: flex; flex-direction: column; gap: 10px;">
+      <label><strong>ללא אלרגנים:</strong> (סמני אלרגנים שאת <strong>לא</strong> רוצה במתכון)</label>
+      
+      @if (availableAllergens.length > 0) {
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; background: #fff5f5; padding: 10px; border-radius: 6px; border: 1px solid #fed7d7;">
+          @for (allergen of availableAllergens; track allergen) {
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: #c53030;">
+              <input type="checkbox" (change)="toggleAllergen(allergen, $event)">
+              ללא {{ allergen }}
+            </label>
+          }
+        </div>
+      } @else {
+        <span style="color: #718096; font-size: 0.9rem;">אין אלרגנים ידועים במתכונים הקיימים.</span>
+      }
+    </div>
+  </div>
+
   @if (loading) {
-    <p style="color: blue;">טוען מתכונים מהשרת (אנא המתן)...</p>
+    <div style="padding: 20px; background: #ebf8ff; border-radius: 8px; color: #2b6cb0; margin-bottom: 20px;">
+      <strong>טוען מתכונים מהשרת... ⏳</strong>
+      <p style="margin: 5px 0 0; font-size: 0.9rem;">אם זה נתקע, ודאי שהשרת פועל בפורט 8080.</p>
+    </div>
   }
   
   @if (errorMessage) {
     <div style="background: #ffebee; color: red; padding: 15px; border-radius: 8px; border: 1px solid red; margin-bottom: 20px;">
-      <h3>שגיאה בטעינת מתכונים:</h3>
+      <h3>שגיאה בטעינת מתכונים מהשרת:</h3>
       <code>{{ errorMessage }}</code>
     </div>
   }
   
   <div class="recipes-grid" style="display: flex; gap: 20px; flex-wrap: wrap;">
-    @for (recipe of recipes; track recipe.title) {
-      <div class="recipe-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; width: 300px; background: #fafafa;">
-        <h3>{{ recipe.title }}</h3>
-        <p><strong>זמן הכנה:</strong> {{ recipe.preparationTimeMinutes }} דקות</p>
-        <p><strong>כשרות:</strong> {{ recipe.kashrut }} | <strong>קושי:</strong> {{ recipe.difficulty }}</p>
-        <p><strong>הוראות:</strong> {{ recipe.instructions }}</p>
+    @for (recipe of filteredRecipes; track recipe.title) {
+      <div class="recipe-card" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; width: 320px; background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s;">
+        <h3 style="margin-top: 0; color: #2d3748;">{{ recipe.title }}</h3>
         
-        <hr>
-        <h4>רכיבים:</h4>
-        <ul>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+          <span style="background: #ebf8ff; color: #2b6cb0; padding: 4px 8px; border-radius: 4px; font-size: 13px;">⏱️ {{ recipe.preparationTimeMinutes }} דקות</span>
+          <span style="background: #f0fff4; color: #2f855a; padding: 4px 8px; border-radius: 4px; font-size: 13px;">🍽️ {{ recipe.kashrut }}</span>
+          <span style="background: #fff5f5; color: #c53030; padding: 4px 8px; border-radius: 4px; font-size: 13px;">📊 {{ recipe.difficulty }}</span>
+        </div>
+
+        <p style="color: #4a5568; line-height: 1.5; font-size: 14px;"><strong>הוראות:</strong> {{ recipe.instructions }}</p>
+        
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 15px 0;">
+        
+        <h4 style="margin: 0 0 10px 0; font-size: 15px; color: #2d3748;">רכיבים:</h4>
+        <ul style="padding-right: 20px; margin: 0 0 15px 0; color: #4a5568; font-size: 14px;">
           @for (ing of recipe.ingredients; track ing.product.name) {
             <li>{{ ing.quantity }} {{ ing.measurementUnit }} - {{ ing.product.name }}</li>
           }
         </ul>
 
-        <div class="allergens" style="margin-top: 10px;">
-          <strong>אלרגנים במתכון:</strong>
-          @for (allergen of recipe.allergens; track allergen) {
-            <span style="background: #ffcccc; color: #cc0000; padding: 2px 6px; margin: 2px; border-radius: 4px; font-size: 12px; display: inline-block;">
-              {{ allergen }}
-            </span>
-          } @empty {
-            <span style="background: #d4edda; color: #155724; padding: 2px 6px; border-radius: 4px; font-size: 12px;">ללא אלרגנים</span>
-          }
+        <div class="allergens" style="margin-top: auto;">
+          <strong style="font-size: 14px; color: #2d3748;">אלרגנים במתכון:</strong>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px;">
+            @for (allergen of recipe.allergens; track allergen) {
+              <span style="background: #fed7d7; color: #9b2c2c; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                ⚠️ {{ allergen }}
+              </span>
+            } @empty {
+              <span style="background: #c6f6d5; color: #22543d; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                ✅ ללא אלרגנים ידועים
+              </span>
+            }
+          </div>
         </div>
       </div>
     } @empty {
       @if (!loading && !errorMessage) {
-        <p>לא נמצאו מתכונים בבסיס הנתונים...</p>
+        <div style="width: 100%; text-align: center; padding: 40px; background: #fff; border-radius: 8px; color: #718096; border: 1px dashed #cbd5e0;">
+          <p style="font-size: 1.1rem; margin: 0;">לא נמצאו מתכונים שתואמים לשילוב הסינונים שבחרת 🔍</p>
+        </div>
       }
     }
   </div>

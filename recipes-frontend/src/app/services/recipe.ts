@@ -7,14 +7,24 @@ import { Recipe } from '../models/recipe.model';
   providedIn: 'root'
 })
 export class RecipeService {
-  // כתובת ה-API של השרת שלכן
-  private apiUrl = 'http://localhost:8080/api/recipes';
+  private apiUrl = 'http://127.0.0.1:8080/api/recipes';
 
   constructor(private http: HttpClient) { }
 
-  // פונקציה שמחזירה רשימת מתכונים מהשרת
   getRecipes(): Observable<Recipe[]> {
     return this.http.get<Recipe[]>(this.apiUrl);
+  }
+
+  getRecipesByKashrut(kashrut: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/filter/kashrut?kashrut=${kashrut}`);
+  }
+
+  getRecipesByDifficulty(difficulty: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/filter/difficulty?difficulty=${difficulty}`);
+  }
+
+  getRecipesWithoutAllergen(allergen: string): Observable<Recipe[]> {
+    return this.http.get<Recipe[]>(`${this.apiUrl}/filter/without-allergen?allergenName=${allergen}`);
   }
 }
 
