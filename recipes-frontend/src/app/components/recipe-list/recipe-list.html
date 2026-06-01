@@ -77,8 +77,8 @@
         
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
           <span style="background: #ebf8ff; color: #2b6cb0; padding: 4px 8px; border-radius: 4px; font-size: 13px;">⏱️ {{ recipe.preparationTimeMinutes }} דקות</span>
-          <span style="background: #f0fff4; color: #2f855a; padding: 4px 8px; border-radius: 4px; font-size: 13px;">🍽️ {{ recipe.kashrut }}</span>
-          <span style="background: #fff5f5; color: #c53030; padding: 4px 8px; border-radius: 4px; font-size: 13px;">📊 {{ recipe.difficulty }}</span>
+          <span style="background: #f0fff4; color: #2f855a; padding: 4px 8px; border-radius: 4px; font-size: 13px;">🍽️ {{ getKashrutHebrew(recipe.kashrut) }}</span>
+          <span style="background: #fff5f5; color: #c53030; padding: 4px 8px; border-radius: 4px; font-size: 13px;">📊 {{ getDifficultyHebrew(recipe.difficulty) }}</span>
         </div>
 
         <p style="color: #4a5568; line-height: 1.5; font-size: 14px;"><strong>הוראות:</strong> {{ recipe.instructions }}</p>
@@ -88,7 +88,7 @@
         <h4 style="margin: 0 0 10px 0; font-size: 15px; color: #2d3748;">רכיבים:</h4>
         <ul style="padding-right: 20px; margin: 0 0 15px 0; color: #4a5568; font-size: 14px;">
           @for (ing of recipe.ingredients; track ing.product.name) {
-            <li>{{ ing.quantity }} {{ ing.measurementUnit }} - {{ ing.product.name }}</li>
+            <li>{{ ing.quantity }} {{ getUnitHebrew(ing.measurementUnit) }} - {{ ing.product.name }}</li>
           }
         </ul>
 

@@ -153,4 +153,40 @@ export class RecipeListComponent implements OnInit {
       });
     }
   }
+
+  getKashrutHebrew(kashrut: string): string {
+    const mapping: { [key: string]: string } = {
+      'PARVE': 'פרווה',
+      'DAIRY': 'חלבי',
+      'MEAT': 'בשרי',
+      'INVALID': 'לא כשר'
+    };
+    return mapping[kashrut] || kashrut;
+  }
+
+  getDifficultyHebrew(difficulty: string): string {
+    const mapping: { [key: string]: string } = {
+      'EASY': 'קל',
+      'MEDIUM': 'בינוני',
+      'HARD': 'קשה'
+    };
+    return mapping[difficulty] || difficulty;
+  }
+
+  getUnitHebrew(unit: string): string {
+    const mapping: { [key: string]: string } = {
+      'GRAM': 'גרם',
+      'KG': 'ק"ג',
+      'KILOGRAM': 'ק"ג',
+      'ML': 'מ"ל',
+      'MILLILITER': 'מ"ל',
+      'LITER': 'ליטר',
+      'CUP': 'כוס',
+      'TABLESPOON': 'כף',
+      'TEASPOON': 'כפית',
+      'UNIT': 'יחידה',
+      'PINCH': 'קורט'
+    };
+    return mapping[unit] || unit;
+  }
 }
