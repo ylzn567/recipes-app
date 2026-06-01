@@ -1,0 +1,17 @@
+.allergen-form-container {
+    background-color: #f7fafc;
+    min-height: calc(100vh - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 50px;
+}
+  
+button:hover:not(:disabled) {
+    background-color: #c53030 !important;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+}

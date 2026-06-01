@@ -39,7 +39,7 @@
           @for (allergenCtrl of allergensFormArray.controls; track $index) {
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #f7fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
               <input type="checkbox" [formControlName]="$index">
-              {{ commonAllergens[$index] }}
+              {{ availableAllergens[$index]?.name }}
             </label>
           }
         </div>

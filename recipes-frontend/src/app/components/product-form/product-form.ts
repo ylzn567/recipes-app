@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductService } from '../../services/product';
+import { AllergenService, Allergen } from '../../services/allergen';
 
 @Component({
   selector: 'app-product-form',
@@ -17,12 +18,13 @@ export class ProductFormComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
 
-  // רשימת אלרגנים נפוצים לבחירה מהירה בטופס
-  commonAllergens = ['גלוטן', 'לקטוז', 'בוטנים', 'אגוזים', 'שומשום', 'ביצים', 'סויה', 'דגים'];
+  // רשימת אלרגנים נמשכת מהשרת
+  availableAllergens: Allergen[] = [];
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
+    private allergenService: AllergenService,
     private router: Router
   ) {}
 
@@ -30,8 +32,18 @@ export class ProductFormComponent implements OnInit {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       kashrut: ['PARVE', Validators.required],
-      // מערך בוליאני שמתאים לרשימת האלרגנים הנפוצים
-      allergens: this.fb.array(this.commonAllergens.map(() => false))
+      allergens: this.fb.array([])
+    });
+
+    this.allergenService.getAllAllergens().subscribe({
+      next: (allergens) => {
+        this.availableAllergens = allergens;
+        const allergensFormArray = this.fb.array(allergens.map(() => false));
+        this.productForm.setControl('allergens', allergensFormArray);
+      },
+      error: (err) => {
+        console.error('Error fetching allergens', err);
+      }
     });
   }
 
@@ -52,9 +64,9 @@ export class ProductFormComponent implements OnInit {
     const formValue = this.productForm.value;
 
     // פילטור רק של האלרגנים שהמנהל סימן כ-true והמרתם למבנה שהשרת מצפה לו
-    const selectedAllergens = this.commonAllergens
+    const selectedAllergens = this.availableAllergens
       .filter((_, index) => formValue.allergens[index])
-      .map(name => ({ name })); // מייצר אובייקט { name: "לקטוז" } עבור ה-Spring Boot
+      .map(allergen => ({ name: allergen.name })); // מייצר אובייקט { name: "לקטוז" } עבור ה-Spring Boot
 
     const newProduct = {
       name: formValue.name,
@@ -67,7 +79,7 @@ export class ProductFormComponent implements OnInit {
       next: () => {
         this.isSubmitting = false;
         this.successMessage = '🎉 המוצר נוסף בהצלחה למערכת!';
-        this.productForm.reset({ name: '', kashrut: 'PARVE', allergens: this.commonAllergens.map(() => false) });
+        this.productForm.reset({ name: '', kashrut: 'PARVE', allergens: this.availableAllergens.map(() => false) });
       },
       error: (err) => {
         this.isSubmitting = false;
