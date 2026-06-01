@@ -38,8 +38,9 @@ export class ProductFormComponent implements OnInit {
     this.allergenService.getAllAllergens().subscribe({
       next: (allergens) => {
         this.availableAllergens = allergens;
-        const allergensFormArray = this.fb.array(allergens.map(() => false));
-        this.productForm.setControl('allergens', allergensFormArray);
+        const allergensFormArray = this.productForm.get('allergens') as FormArray;
+        allergensFormArray.clear();
+        allergens.forEach(() => allergensFormArray.push(this.fb.control(false)));
       },
       error: (err) => {
         console.error('Error fetching allergens', err);

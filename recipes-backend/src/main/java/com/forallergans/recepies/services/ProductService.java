@@ -6,19 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.forallergans.recepies.entities.Product;
+import com.forallergans.recepies.entities.Allergen;
 import com.forallergans.recepies.entities.User;
 import com.forallergans.recepies.entities.Role;
 import com.forallergans.recepies.repositories.ProductRepository;
+import com.forallergans.recepies.repositories.AllergenRepository;
+import java.util.Set;
+import java.util.HashSet;
 
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final AllergenRepository allergenRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, AllergenRepository allergenRepository) {
         this.productRepository = productRepository;
+        this.allergenRepository = allergenRepository;
     }
 //לבדוק האם שימושי בכלל ולא מיותר
     // שליפת כל המוצרים - מותר לכולם (משתמשים ומנהלים)
@@ -39,6 +45,16 @@ public class ProductService {
             throw new RuntimeException("מוצר עם שם זה כבר קיים במערכת");
         }
         
+        if (product.getAllergens() != null) {
+            Set<Allergen> persistedAllergens = new HashSet<>();
+            for (Allergen a : product.getAllergens()) {
+                if (a.getName() != null) {
+                    allergenRepository.findByName(a.getName()).ifPresent(persistedAllergens::add);
+                }
+            }
+            product.setAllergens(persistedAllergens);
+        }
+        
         return productRepository.save(product);
     }
 
@@ -50,7 +66,18 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("המוצר לעדכון לא נמצא"));
 
         existingProduct.setName(updatedData.getName());
-        existingProduct.setAllergens(updatedData.getAllergens());
+        
+        if (updatedData.getAllergens() != null) {
+            Set<Allergen> persistedAllergens = new HashSet<>();
+            for (Allergen a : updatedData.getAllergens()) {
+                if (a.getName() != null) {
+                    allergenRepository.findByName(a.getName()).ifPresent(persistedAllergens::add);
+                }
+            }
+            existingProduct.setAllergens(persistedAllergens);
+        } else {
+            existingProduct.setAllergens(null);
+        }
 
         return productRepository.save(existingProduct);
     }
