@@ -1,0 +1,54 @@
+<div class="product-form-container" style="direction: rtl; font-family: sans-serif; padding: 20px; max-width: 500px; margin: 0 auto;">
+  <div class="form-card" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h2 style="color: #2d3748; margin-top: 0; text-align: center;">🍎 הוספת מוצר חדש למערכת</h2>
+    
+    @if (errorMessage) {
+      <div class="alert error" style="color: #9b2c2c; background-color: #fff5f5; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #feb2b2;">
+        ⚠️ {{ errorMessage }}
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="alert success" style="color: #22543d; background-color: #c6f6d5; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #c6f6d5;">
+        {{ successMessage }}
+      </div>
+    }
+
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">שם המוצר / מצרך:</label>
+        <input type="text" formControlName="name" placeholder="למשל: שמנת חמוצה 15%" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px; box-sizing: border-box;">
+        @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
+          <small style="color: red; display: block; margin-top: 5px;">יש להזין שם מוצר תקין (מינימום 2 אותיות)</small>
+        }
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">סוג כשרות:</label>
+        <select formControlName="kashrut" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;">
+          <option value="PARVE">🌾 פרווה</option>
+          <option value="DAIRY">🥛 חלבי</option>
+          <option value="MEAT">🍖 בשרי</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">אלרגנים קיימים במוצר:</label>
+        <div formArrayName="allergens" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          @for (allergenCtrl of allergensFormArray.controls; track $index) {
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #f7fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+              <input type="checkbox" [formControlName]="$index">
+              {{ commonAllergens[$index] }}
+            </label>
+          }
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="isSubmitting || productForm.invalid" style="width: 100%; padding: 12px; background-color: #3182ce; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer;">
+        {{ isSubmitting ? 'שומר מוצר...' : '💾 הוסף מוצר לבסיס הנתונים' }}
+      </button>
+
+    </form>
+  </div>
+</div>
