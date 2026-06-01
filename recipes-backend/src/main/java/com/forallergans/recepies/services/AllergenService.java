@@ -48,7 +48,7 @@ public class AllergenService {
     }
 
     private void validateAdmin(User currentUser) {
-        if (currentUser.getRole() != Role.ADMIN) {
+        if (currentUser != null && currentUser.getRole() != Role.ADMIN) {
             throw new SecurityException("פעולה זו מורשית למנהלי מערכת בלבד.");
         }
     }
