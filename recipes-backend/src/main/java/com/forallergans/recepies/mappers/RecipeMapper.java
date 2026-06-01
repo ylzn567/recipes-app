@@ -16,6 +16,7 @@ public class RecipeMapper {
         }
 
         RecipeDTO dto = new RecipeDTO();
+        dto.setId(recipe.getId());
         dto.setTitle(recipe.getTitle());
         dto.setInstructions(recipe.getInstructions());
         dto.setPreparationTimeMinutes(recipe.getPreparationTimeMinutes());

@@ -12,8 +12,9 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    // מפתח סודי להצפנה (בפרויקט אמיתי שומרים אותו בקובץ application.properties)
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // מפתח סודי קבוע להצפנה כדי למנוע ניתוקים בכל הפעלה מחדש של השרת
+    private final String secretString = "mySuperSecretKeyForJwtSigning12345678901234567890";
+    private final Key key = Keys.hmacShaKeyFor(secretString.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     
     // תוקף הטוקן: 24 שעות במילישניות
     private final long jwtExpirationMs = 86400000;

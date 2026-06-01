@@ -22,11 +22,15 @@ export class ProductService {
   }
 
   // 🌟 תשתית עתידית עבור מנהל המערכת (Admin)
-  addProduct(product: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, product);
+  addProduct(product: any): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product);
   }
 
-  deleteProduct(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  updateProduct(id: number, product: any): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
+  }
+
+  deleteProduct(id: number): Observable<string> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
 }

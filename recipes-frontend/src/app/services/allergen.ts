@@ -11,7 +11,7 @@ export interface Allergen {
   providedIn: 'root'
 })
 export class AllergenService {
-  private apiUrl = 'http://127.0.0.1:8080/api/allergens';
+  private apiUrl = 'http://localhost:8080/api/allergens';
 
   constructor(private http: HttpClient) {}
 
@@ -23,7 +23,12 @@ export class AllergenService {
     return this.http.post<Allergen>(this.apiUrl, allergen);
   }
 
+  updateAllergen(id: number, allergen: Allergen): Observable<Allergen> {
+    return this.http.put<Allergen>(`${this.apiUrl}/${id}`, allergen);
+  }
+
   deleteAllergen(id: number): Observable<string> {
-    return this.http.delete<string>(`${this.apiUrl}/${id}`);
+    // מחיקה עשויה להחזיר פשוט טקסט במקרה של הצלחה
+    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
 }

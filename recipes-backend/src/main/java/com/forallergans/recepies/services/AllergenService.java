@@ -44,7 +44,28 @@ public class AllergenService {
             throw new RuntimeException("האלרגן למחיקה לא נמצא");
         }
         
-        allergenRepository.deleteById(allergenId);
+        try {
+            allergenRepository.deleteById(allergenId);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("לא ניתן למחוק אלרגן זה כי הוא נמצא בשימוש במוצרים קיימים במערכת");
+        }
+    }
+
+    // עדכון אלרגן - מנהל בלבד
+    public Allergen updateAllergen(Long allergenId, Allergen updatedData, User currentUser) {
+        validateAdmin(currentUser);
+        
+        Allergen existing = allergenRepository.findById(allergenId)
+            .orElseThrow(() -> new RuntimeException("האלרגן לא נמצא"));
+            
+        // בדוק שאין אלרגן אחר עם אותו שם
+        if (!existing.getName().equals(updatedData.getName()) && 
+            allergenRepository.findByName(updatedData.getName()).isPresent()) {
+            throw new RuntimeException("אלרגן עם שם כזה כבר קיים");
+        }
+        
+        existing.setName(updatedData.getName());
+        return allergenRepository.save(existing);
     }
 
     private void validateAdmin(User currentUser) {

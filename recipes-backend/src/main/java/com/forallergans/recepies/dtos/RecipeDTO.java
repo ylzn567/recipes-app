@@ -8,6 +8,7 @@ import com.forallergans.recepies.entities.Kashrut;
 
 @Data
 public class RecipeDTO {
+    private Long id;
     private String title;
     private String instructions;
     private int preparationTimeMinutes;

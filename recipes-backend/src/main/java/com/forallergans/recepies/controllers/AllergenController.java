@@ -33,10 +33,22 @@ public class AllergenController {
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
+    // עדכון אלרגן קיים - מנהל בלבד
+    @PutMapping("/{id}")
+    public ResponseEntity<Allergen> updateAllergen(@PathVariable Long id, @RequestBody Allergen allergen) {
+        Allergen updated = allergenService.updateAllergen(id, allergen, null);
+        return ResponseEntity.ok(updated);
+    }
+
     // מחיקת אלרגן מהמערכת - חסום ב-SecurityConfig רק ל-ADMIN
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAllergen(@PathVariable Long id) {
         allergenService.deleteAllergen(id, null);
         return ResponseEntity.ok("האלרגן נמחק בהצלחה");
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

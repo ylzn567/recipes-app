@@ -106,6 +106,13 @@
             }
           </div>
         </div>
+
+        @if (canEdit(recipe)) {
+          <div style="margin-top: 15px; border-top: 1px dashed #cbd5e0; padding-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+            <button (click)="editRecipe(recipe)" style="background: #4299e1; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;">✏️ ערוך</button>
+            <button (click)="deleteRecipe(recipe)" style="background: #e53e3e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;">🗑️ מחק</button>
+          </div>
+        }
       </div>
     } @empty {
       @if (!loading && !errorMessage) {

@@ -98,7 +98,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RecipeService } from '../../services/recipe';
 import { ProductService } from '../../services/product'; // 🌟 ייבוא שירות המוצרים החדש
 
@@ -113,6 +113,8 @@ export class RecipeFormComponent implements OnInit {
   recipeForm!: FormGroup;
   isSubmitting = false;
   errorMessage = '';
+  editingRecipeId: number | null = null;
+  isEditMode = false;
 
   // 🌟 רשימת המוצרים שתטען מהשרת
   availableProducts: any[] = []; 
@@ -124,8 +126,9 @@ export class RecipeFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private recipeService: RecipeService,
-    private productService: ProductService, // 🌟 הזרקת שירות המוצרים בבנאי
-    private router: Router
+    private productService: ProductService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -141,8 +144,17 @@ export class RecipeFormComponent implements OnInit {
       ingredients: this.fb.array([])
     });
 
-    // נוסיף מצרך אחד ריק כברירת מחדל
-    this.addIngredient();
+    // נוסיף מצרך אחד ריק כברירת מחדל אם זו יצירה
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      if (idParam) {
+        this.isEditMode = true;
+        this.editingRecipeId = +idParam;
+        this.loadRecipeForEditing(this.editingRecipeId);
+      } else {
+        this.addIngredient();
+      }
+    });
   }
 
   get ingredients(): FormArray {
@@ -160,6 +172,42 @@ export class RecipeFormComponent implements OnInit {
         console.error('שגיאה בטעינת רשימת המוצרים מהשרת:', err);
         this.errorMessage = 'לא ניתן לטעון את רשימת המצרכים המאושרים.';
       }
+    });
+  }
+
+  loadRecipeForEditing(id: number): void {
+    // שלוף את המתכון הקיים מהשרת
+    // הערה: נניח שיש לנו מתודה getRecipeById, אם אין נוסיף אותה ל-RecipeService
+    this.recipeService.getRecipes().subscribe({
+      next: (recipes) => {
+        const recipe = recipes.find(r => r.id === id);
+        if (recipe) {
+          this.recipeForm.patchValue({
+            title: recipe.title,
+            instructions: recipe.instructions,
+            preparationTimeMinutes: recipe.preparationTimeMinutes,
+            difficulty: recipe.difficulty
+          });
+
+          // טעינת מצרכים
+          if (recipe.ingredients && recipe.ingredients.length > 0) {
+            recipe.ingredients.forEach(ing => {
+              const ingForm = this.fb.group({
+                productName: [ing.product.name, Validators.required],
+                quantity: [ing.quantity, [Validators.required, Validators.min(0.1)]],
+                measurementUnit: [ing.measurementUnit, Validators.required]
+              });
+              this.ingredients.push(ingForm);
+            });
+            this.recalculateRecipeSpecs();
+          } else {
+            this.addIngredient();
+          }
+        } else {
+          this.errorMessage = 'המתכון המבוקש לא נמצא';
+        }
+      },
+      error: () => this.errorMessage = 'שגיאה בטעינת המתכון'
     });
   }
 
@@ -258,15 +306,28 @@ export class RecipeFormComponent implements OnInit {
       }))
     };
 
-    this.recipeService.createRecipe(newRecipe).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.router.navigate(['/']); // חזרה לדף הבית
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        this.errorMessage = err.error?.message || err.message || 'שגיאה בשמירת המתכון';
-      }
-    });
+    if (this.isEditMode && this.editingRecipeId) {
+      this.recipeService.updateRecipe(this.editingRecipeId, newRecipe).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage = err.error?.message || err.message || 'שגיאה בעדכון המתכון';
+        }
+      });
+    } else {
+      this.recipeService.createRecipe(newRecipe).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.errorMessage = err.error?.message || err.message || 'שגיאה בשמירת המתכון';
+        }
+      });
+    }
   }
 }

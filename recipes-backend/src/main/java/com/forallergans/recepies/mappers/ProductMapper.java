@@ -14,6 +14,7 @@ public class ProductMapper {
         }
 
         ProductDTO dto = new ProductDTO();
+        dto.setId(product.getId());
         dto.setName(product.getName());
         
         if (product.getAllergens() != null) {

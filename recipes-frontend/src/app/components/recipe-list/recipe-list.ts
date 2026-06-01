@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { RecipeService } from '../../services/recipe';
 import { Recipe } from '../../models/recipe.model';
 
+import { AuthService } from '../../services/auth';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-recipe-list',
   standalone: true,
@@ -27,7 +30,12 @@ export class RecipeListComponent implements OnInit {
   // אלרגנים שהמשתמש סימן ב-Checkbox (אלרגנים שהוא *לא* רוצה)
   excludedAllergens: Set<string> = new Set<string>();
 
-  constructor(private recipeService: RecipeService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private recipeService: RecipeService, 
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadAllRecipes();
@@ -114,5 +122,35 @@ export class RecipeListComponent implements OnInit {
     checkboxes.forEach((cb: any) => cb.checked = false);
 
     this.applyCombinedFilters();
+  }
+
+  canEdit(recipe: Recipe): boolean {
+    if (this.authService.isAdmin()) return true;
+    const currentUser = this.authService.getUsername();
+    return currentUser !== null && currentUser === recipe.createdByUsername;
+  }
+
+  editRecipe(recipe: Recipe): void {
+    if (recipe.id) {
+      this.router.navigate(['/edit-recipe', recipe.id]);
+    }
+  }
+
+  deleteRecipe(recipe: Recipe): void {
+    if (!recipe.id) return;
+    if (confirm(`האם אתה בטוח שברצונך למחוק את המתכון "${recipe.title}"?`)) {
+      this.recipeService.deleteRecipe(recipe.id).subscribe({
+        next: () => {
+          this.allRecipes = this.allRecipes.filter(r => r.id !== recipe.id);
+          this.applyCombinedFilters();
+          this.extractAllergens();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          const msg = typeof err.error === 'string' ? err.error : (err.error?.message || err.message);
+          alert('שגיאה במחיקת המתכון: ' + msg);
+        }
+      });
+    }
   }
 }

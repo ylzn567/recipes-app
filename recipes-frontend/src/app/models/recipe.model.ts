@@ -8,6 +8,7 @@ export interface Ingredient {
 }
 
 export interface Recipe {
+  id?: number;
   title: string;
   instructions: string;
   preparationTimeMinutes: number;

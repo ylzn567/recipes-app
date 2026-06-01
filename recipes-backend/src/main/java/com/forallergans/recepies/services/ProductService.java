@@ -90,7 +90,11 @@ public class ProductService {
             throw new RuntimeException("המוצר למחיקה לא נמצא");
         }
         
-        productRepository.deleteById(productId);
+        try {
+            productRepository.deleteById(productId);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("לא ניתן למחוק מוצר זה כי הוא נמצא בשימוש במתכונים קיימים");
+        }
     }
 
     // מתודת עזר פרטית לבדיקת תפקיד המנהל
