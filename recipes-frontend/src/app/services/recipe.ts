@@ -7,7 +7,7 @@ import { Recipe } from '../models/recipe.model';
   providedIn: 'root'
 })
 export class RecipeService {
-  private apiUrl = 'http://127.0.0.1:8080/api/recipes';
+  private apiUrl = 'http://localhost:8080/api/recipes';
 
   constructor(private http: HttpClient) { }
 

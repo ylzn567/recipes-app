@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+export interface Product {
+  id?: number;
+  name: string;
+  allergens?: string[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +17,8 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   // משיכת כל המוצרים (עבור ה-Dropdown של המתכונים כרגע)
-  getAllProducts(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getAllProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.apiUrl);
   }
 
   // 🌟 תשתית עתידית עבור מנהל המערכת (Admin)

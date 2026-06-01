@@ -5,6 +5,7 @@ import { RegisterComponent } from './components/register/register';
 import { RecipeFormComponent } from './components/recipe-form/recipe-form';
 import {ProductFormComponent} from './components/product-form/product-form'
 import { AllergenFormComponent } from './components/allergen-form/allergen-form';
+import { ProductListComponent } from './components/product-list/product-list';
 
 export const routes: Routes = [
   { path: '', component: RecipeListComponent },
@@ -12,5 +13,6 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'add-recipe', component: RecipeFormComponent },
   { path: 'admin/add-product', component: ProductFormComponent },
-  { path: 'admin/add-allergen', component: AllergenFormComponent }
+  { path: 'admin/add-allergen', component: AllergenFormComponent },
+  { path: 'admin/products', component: ProductListComponent }
 ];

@@ -61,4 +61,9 @@ public class ProductController {
         productService.deleteProduct(id, null);
         return ResponseEntity.ok("המוצר נמחק בהצלחה");
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

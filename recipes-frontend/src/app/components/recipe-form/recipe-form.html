@@ -154,7 +154,7 @@
             
             <select formControlName="productName" class="form-control ing-name" style="flex: 2;" (change)="onProductSelected()">
               <option value="" disabled selected>בחרי מצרך מהמערכת...</option>
-              @for (prod of availableProducts; track prod.id) {
+              @for (prod of availableProducts; track prod.name) {
                 <option [value]="prod.name">{{ prod.name }}</option>
               }
             </select>

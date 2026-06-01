@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -25,7 +25,8 @@ export class ProductFormComponent implements OnInit {
     private fb: FormBuilder,
     private productService: ProductService,
     private allergenService: AllergenService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +42,7 @@ export class ProductFormComponent implements OnInit {
         const allergensFormArray = this.productForm.get('allergens') as FormArray;
         allergensFormArray.clear();
         allergens.forEach(() => allergensFormArray.push(this.fb.control(false)));
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching allergens', err);
@@ -84,7 +86,10 @@ export class ProductFormComponent implements OnInit {
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage = err.error?.message || err.message || 'שגיאה בהוספת המוצר';
+        // חילוץ הודעת השגיאה - ייתכן שמגיעה כמחרוזת פשוטה או כאובייקט
+        const errorMsg = typeof err.error === 'string' ? err.error : (err.error?.message || err.message || 'שגיאה בהוספת המוצר');
+        this.errorMessage = errorMsg;
+        console.error(err);
       }
     });
   }

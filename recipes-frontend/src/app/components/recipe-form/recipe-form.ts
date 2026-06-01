@@ -153,6 +153,7 @@ export class RecipeFormComponent implements OnInit {
   loadAvailableProducts(): void {
     this.productService.getAllProducts().subscribe({
       next: (products) => {
+        console.log('Fetched products:', products);
         this.availableProducts = products || [];
       },
       error: (err) => {

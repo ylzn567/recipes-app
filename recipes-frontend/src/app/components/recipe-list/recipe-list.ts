@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RecipeService } from '../../services/recipe';
@@ -27,7 +27,7 @@ export class RecipeListComponent implements OnInit {
   // אלרגנים שהמשתמש סימן ב-Checkbox (אלרגנים שהוא *לא* רוצה)
   excludedAllergens: Set<string> = new Set<string>();
 
-  constructor(private recipeService: RecipeService) {}
+  constructor(private recipeService: RecipeService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadAllRecipes();
@@ -45,11 +45,13 @@ export class RecipeListComponent implements OnInit {
         this.extractAllergens();
         this.loading = false;
         this.errorMessage = null;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loading = false;
         this.errorMessage = err.message || JSON.stringify(err);
         console.error('שגיאה בשליפת המתכונים:', err);
+        this.cdr.detectChanges();
       }
     });
   }
