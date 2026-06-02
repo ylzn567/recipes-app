@@ -67,16 +67,16 @@ public class DataInitializer implements CommandLineRunner {
             Allergen fish = allergenRepository.save(createAllergen("דגים"));
 
             // 4. יצירת מוצרים נפוצים
-            Product flour = productRepository.save(createProduct("קמח חיטה", Set.of(gluten)));
-            Product butter = productRepository.save(createProduct("חמאה", Set.of(lactose)));
-            Product milk = productRepository.save(createProduct("חלב", Set.of(lactose)));
-            Product peanutButter = productRepository.save(createProduct("חמאת בוטנים", Set.of(peanuts)));
-            Product egg = productRepository.save(createProduct("ביצה", Set.of(eggs)));
-            Product soySauce = productRepository.save(createProduct("רוטב סויה", Set.of(soy, gluten)));
-            Product salmon = productRepository.save(createProduct("סלמון", Set.of(fish)));
-            Product tahini = productRepository.save(createProduct("טחינה גולמית", Set.of(sesame)));
-            Product sugar = productRepository.save(createProduct("סוכר", Set.of()));
-            Product chocolate = productRepository.save(createProduct("שוקולד מריר", Set.of(soy))); // עלול להכיל סויה
+            Product flour = productRepository.save(createProduct("קמח חיטה", Kashrut.PARVE, Set.of(gluten)));
+            Product butter = productRepository.save(createProduct("חמאה", Kashrut.DAIRY, Set.of(lactose)));
+            Product milk = productRepository.save(createProduct("חלב", Kashrut.DAIRY, Set.of(lactose)));
+            Product peanutButter = productRepository.save(createProduct("חמאת בוטנים", Kashrut.PARVE, Set.of(peanuts)));
+            Product egg = productRepository.save(createProduct("ביצה", Kashrut.PARVE, Set.of(eggs)));
+            Product soySauce = productRepository.save(createProduct("רוטב סויה", Kashrut.PARVE, Set.of(soy, gluten)));
+            Product salmon = productRepository.save(createProduct("סלמון", Kashrut.PARVE, Set.of(fish)));
+            Product tahini = productRepository.save(createProduct("טחינה גולמית", Kashrut.PARVE, Set.of(sesame)));
+            Product sugar = productRepository.save(createProduct("סוכר", Kashrut.PARVE, Set.of()));
+            Product chocolate = productRepository.save(createProduct("שוקולד מריר", Kashrut.PARVE, Set.of(soy))); // עלול להכיל סויה
 
             // 5. יצירת מתכונים דוגמה
             
@@ -150,9 +150,10 @@ public class DataInitializer implements CommandLineRunner {
         return a;
     }
 
-    private Product createProduct(String name, Set<Allergen> allergens) {
+    private Product createProduct(String name, Kashrut kashrut, Set<Allergen> allergens) {
         Product p = new Product();
         p.setName(name);
+        p.setKashrut(kashrut);
         p.setAllergens(allergens);
         return p;
     }

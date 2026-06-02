@@ -66,6 +66,7 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("המוצר לעדכון לא נמצא"));
 
         existingProduct.setName(updatedData.getName());
+        existingProduct.setKashrut(updatedData.getKashrut());
         
         if (updatedData.getAllergens() != null) {
             Set<Allergen> persistedAllergens = new HashSet<>();

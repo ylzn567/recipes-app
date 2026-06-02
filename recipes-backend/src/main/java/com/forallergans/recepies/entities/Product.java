@@ -16,6 +16,10 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Kashrut kashrut = Kashrut.PARVE;
+
     @ManyToMany
     @JoinTable(
         name = "product_allergens",

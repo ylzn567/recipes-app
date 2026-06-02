@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 export interface Product {
   id?: number;
   name: string;
+  kashrut?: string;
   allergens?: string[];
 }
 
